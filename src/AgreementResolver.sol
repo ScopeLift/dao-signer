@@ -3,7 +3,7 @@ pragma solidity ^0.8.30;
 
 import {SchemaResolver} from "eas-contracts/resolver/SchemaResolver.sol";
 import {IEAS, Attestation} from "eas-contracts/IEAS.sol";
-import {StatefulAgreementAnchor} from "./StatefulAgreementAnchor.sol";
+import {AgreementAnchor} from "./AgreementAnchor.sol";
 
 contract AgreementResolver is SchemaResolver {
   constructor(IEAS eas) SchemaResolver(eas) {}
@@ -14,7 +14,7 @@ contract AgreementResolver is SchemaResolver {
     override
     returns (bool)
   {
-    (address _attester, StatefulAgreementAnchor _anchor) = _enforceAttestationRules(attestation);
+    (address _attester, AgreementAnchor _anchor) = _enforceAttestationRules(attestation);
 
     // If rules pass, update the anchor with the new attestation UID
     _anchor.updateAttestation(_attester, attestation.uid);
@@ -25,10 +25,10 @@ contract AgreementResolver is SchemaResolver {
   function _enforceAttestationRules(Attestation calldata attestation)
     internal
     view
-    returns (address attester, StatefulAgreementAnchor anchor)
+    returns (address attester, AgreementAnchor anchor)
   {
     attester = attestation.attester;
-    anchor = StatefulAgreementAnchor(attestation.recipient);
+    anchor = AgreementAnchor(attestation.recipient);
 
     // The attester must be one of the two parties defined in the anchor
     require(
@@ -51,7 +51,7 @@ contract AgreementResolver is SchemaResolver {
     returns (bool)
   {
     address attester = attestation.attester;
-    StatefulAgreementAnchor _anchor = StatefulAgreementAnchor(attestation.recipient);
+    AgreementAnchor _anchor = AgreementAnchor(attestation.recipient);
     // The attester must be one of the two parties defined in the anchor
     require(
       attester == _anchor.partyA() || attester == _anchor.partyB(), "Not a party to this agreement"

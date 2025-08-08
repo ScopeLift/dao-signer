@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-contract StatefulAgreementAnchor {
+contract AgreementAnchor {
   bytes32 public immutable contentHash;
   address public immutable partyA;
   address public immutable partyB;
@@ -12,7 +12,7 @@ contract StatefulAgreementAnchor {
   bool public isRevoked;
 
   modifier onlyResolver() {
-    require(msg.sender == resolver, "Only the resolver can update state");
+    require(msg.sender == resolver, "Only the EAS resolver can update state");
     _;
   }
 

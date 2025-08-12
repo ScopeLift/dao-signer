@@ -56,8 +56,15 @@ contract AgreementResolver is SchemaResolver {
     require(
       attester == _anchor.partyA() || attester == _anchor.partyB(), "Not a party to this agreement"
     );
-    // Revoke the anchor
-    _anchor.revoke();
+    // The attestation UID must match the anchor's attestation UID
+    require(
+      attestation.uid == _anchor.partyA_attestationUID()
+        || attestation.uid == _anchor.partyB_attestationUID(),
+      "Attestation UID does not match the anchor"
+    );
+
+    // Mark the anchor as revoked
+    _anchor.setRevoked();
     return true;
   }
 }

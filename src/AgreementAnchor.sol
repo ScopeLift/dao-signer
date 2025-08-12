@@ -11,6 +11,9 @@ contract AgreementAnchor {
   bytes32 public partyB_attestationUID;
   bool public isRevoked;
 
+  error AgreementRevoked();
+  error AgreementAlreadyAttested();
+
   modifier onlyResolver() {
     require(msg.sender == resolver, "Only the EAS resolver can update state");
     _;
@@ -25,13 +28,15 @@ contract AgreementAnchor {
 
   // Called by the resolver to update the latest attestation UID for a party
   function updateAttestation(address party, bytes32 uid) external onlyResolver {
-    // TODO: if both parties have attested, revert on update?
-    // TODO: if counterparty attestation is revoked, revert?
+    if (isRevoked) revert AgreementRevoked();
+    if (partyA_attestationUID != 0x0 && partyB_attestationUID != 0x0) {
+      revert AgreementAlreadyAttested();
+    }
     if (party == partyA) partyA_attestationUID = uid;
     else if (party == partyB) partyB_attestationUID = uid;
   }
 
-  function revoke() external onlyResolver {
+  function setRevoked() external onlyResolver {
     isRevoked = true;
   }
 }

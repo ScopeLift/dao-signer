@@ -5,7 +5,6 @@
   remappings = [
     "openzeppelin-contracts=lib/openzeppelin-contracts",
   ]
-  solc_version = "0.8.30"
   verbosity = 3
 
 [profile.ci]

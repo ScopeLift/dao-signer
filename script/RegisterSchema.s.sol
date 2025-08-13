@@ -5,7 +5,6 @@ import {Script} from "forge-std/Script.sol";
 import {IEAS, AttestationRequest, AttestationRequestData} from "eas-contracts/IEAS.sol";
 import {ISchemaRegistry} from "eas-contracts/ISchemaRegistry.sol";
 import {AgreementResolver} from "src/AgreementResolver.sol";
-import {AgreementFactory} from "src/AgreementFactory.sol";
 
 abstract contract DeployAndRegisterSchema is Script {
   struct Config {
@@ -24,11 +23,8 @@ abstract contract DeployAndRegisterSchema is Script {
     IEAS eas = IEAS(config().eas);
     ISchemaRegistry schemaRegistry = ISchemaRegistry(config().schemaRegistry);
 
-    // Deploy resolver
-    AgreementResolver resolver = new AgreementResolver(eas);
-
-    // Deploy AgreementFactory
-    new AgreementFactory(address(resolver), config().primarySigner);
+    // Deploy resolver (and factory)
+    AgreementResolver resolver = new AgreementResolver(eas, config().primarySigner);
 
     // Deploy the schema
     string memory schema = "bytes32 hashOfDocument,string note";

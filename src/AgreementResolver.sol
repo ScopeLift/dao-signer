@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+pragma solidity ^0.8.28;
 
 import {SchemaResolver} from "eas-contracts/resolver/SchemaResolver.sol";
 import {IEAS, Attestation} from "eas-contracts/IEAS.sol";
-import {AgreementAnchor} from "./AgreementAnchor.sol";
+import {AgreementAnchor} from "src/AgreementAnchor.sol";
+import {AgreementFactory} from "src/AgreementFactory.sol";
 
 contract AgreementResolver is SchemaResolver {
-  constructor(IEAS eas) SchemaResolver(eas) {}
+  AgreementFactory public immutable factory;
+
+  constructor(IEAS eas, address _signer) SchemaResolver(eas) {
+    factory = new AgreementFactory(_signer, address(this));
+  }
 
   // This hook runs every time an attestation with this resolver is made
   function onAttest(Attestation calldata attestation, uint256 /* value */ )
@@ -56,15 +61,14 @@ contract AgreementResolver is SchemaResolver {
     require(
       attester == _anchor.partyA() || attester == _anchor.partyB(), "Not a party to this agreement"
     );
-    // The attestation UID must match the anchor's attestation UID
-    require(
-      attestation.uid == _anchor.partyA_attestationUID()
-        || attestation.uid == _anchor.partyB_attestationUID(),
-      "Attestation UID does not match the anchor"
-    );
+    // Parties can revoke any attestation they've made, but we'll only mark the anchor as revoked if
+    // the attestation is the latest one for that party
 
-    // Mark the anchor as revoked
-    _anchor.onRevoke();
+    if (
+      attestation.uid == _anchor.partyA_attestationUID()
+        || attestation.uid == _anchor.partyB_attestationUID()
+    ) _anchor.onRevoke();
+
     return true;
   }
 }

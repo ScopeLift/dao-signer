@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+pragma solidity ^0.8.28;
 
 contract AgreementAnchor {
   bytes32 public immutable contentHash;
@@ -13,6 +13,7 @@ contract AgreementAnchor {
 
   error AgreementRevoked();
   error AgreementAlreadyAttested();
+  error NotAParty();
 
   modifier onlyResolver() {
     require(msg.sender == resolver, "Only the EAS resolver can update state");
@@ -34,6 +35,7 @@ contract AgreementAnchor {
     }
     if (party == partyA) partyA_attestationUID = uid;
     else if (party == partyB) partyB_attestationUID = uid;
+    else revert NotAParty();
   }
 
   function onRevoke() external onlyResolver {

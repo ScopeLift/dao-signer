@@ -27,7 +27,7 @@ contract AgreementAnchor {
   }
 
   // Called by the resolver to update the latest attestation UID for a party
-  function updateAttestation(address party, bytes32 uid) external onlyResolver {
+  function onAttest(address party, bytes32 uid) external onlyResolver {
     if (isRevoked) revert AgreementRevoked();
     if (partyA_attestationUID != 0x0 && partyB_attestationUID != 0x0) {
       revert AgreementAlreadyAttested();
@@ -36,7 +36,7 @@ contract AgreementAnchor {
     else if (party == partyB) partyB_attestationUID = uid;
   }
 
-  function setRevoked() external onlyResolver {
+  function onRevoke() external onlyResolver {
     isRevoked = true;
   }
 }

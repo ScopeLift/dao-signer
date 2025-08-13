@@ -17,7 +17,7 @@ contract AgreementResolver is SchemaResolver {
     (address _attester, AgreementAnchor _anchor) = _enforceAttestationRules(attestation);
 
     // If rules pass, update the anchor with the new attestation UID
-    _anchor.updateAttestation(_attester, attestation.uid);
+    _anchor.onAttest(_attester, attestation.uid);
 
     return true;
   }
@@ -64,7 +64,7 @@ contract AgreementResolver is SchemaResolver {
     );
 
     // Mark the anchor as revoked
-    _anchor.setRevoked();
+    _anchor.onRevoke();
     return true;
   }
 }

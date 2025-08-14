@@ -31,3 +31,9 @@
   single_line_statement_blocks = "single"
   tab_width = 2
   wrap_comments = true
+
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }

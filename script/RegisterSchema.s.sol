@@ -35,7 +35,7 @@ abstract contract DeployAndRegisterSchema is Script {
       data: AttestationRequestData({
         recipient: address(0),
         expirationTime: 0,
-        revocable: true, // TODO: do we want the name of the schema to be revocable?
+        revocable: true,
         refUID: bytes32(0),
         data: abi.encode(schemaHash, config().schemaName),
         value: 0

@@ -43,7 +43,7 @@ contract Constructor is AgreementAnchorTest {
     assertEq(anchor.resolver(), _resolver);
     assertEq(anchor.partyA_attestationUID(), bytes32(0));
     assertEq(anchor.partyB_attestationUID(), bytes32(0));
-    assertFalse(anchor.isRevoked());
+    assertFalse(anchor.didEitherPartyRevoke());
   }
 }
 
@@ -75,10 +75,11 @@ contract OnAttest is AgreementAnchorTest {
     assertEq(anchor.partyB_attestationUID(), _uid);
   }
 
-  function testFuzz_RevertIf_AttestationForNonParty(bytes32 _uid) public {
+  function testFuzz_RevertIf_AttestationForNonParty(address _notParty, bytes32 _uid) public {
+    vm.assume(_notParty != partyA && _notParty != partyB);
     vm.prank(resolver);
     vm.expectRevert(AgreementAnchor.NotAParty.selector);
-    anchor.onAttest(other, _uid);
+    anchor.onAttest(_notParty, _uid);
   }
 
   function testFuzz_RevertIf_AgreementIsRevoked(address _party, bytes32 _uid) public {
@@ -118,9 +119,9 @@ contract OnRevoke is AgreementAnchorTest {
     anchor.onRevoke();
   }
 
-  function test_SetsIsRevoked() public {
+  function test_SetsDidEitherPartyRevoke() public {
     vm.prank(resolver);
     anchor.onRevoke();
-    assertTrue(anchor.isRevoked());
+    assertTrue(anchor.didEitherPartyRevoke());
   }
 }

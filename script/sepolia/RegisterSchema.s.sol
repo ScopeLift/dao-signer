@@ -5,9 +5,8 @@ import {DeployAndRegisterSchema} from "../RegisterSchema.s.sol";
 
 contract SepoliaConfig is DeployAndRegisterSchema {
   // DAO-related config
-  string public constant SCHEMA_NAME = "Guinea Pig DAO Agreement";
-  // TODO: Guinea Pig DAO address
-  address public constant PRIMARY_SIGNER = 0x0000000000000000000000000000000000000000;
+  string public constant SCHEMA_NAME = "Sandboxed Agreement";
+  address public constant PRIMARY_SIGNER = 0xaecd4410c9b69E34F4365bc2FBd489675F739d83;
 
   // EAS-related config
   address public constant EAS_ADDRESS = 0xC2679fBD37d54388Ce493F1DB75320D236e1815e;

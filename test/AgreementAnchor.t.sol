@@ -84,7 +84,7 @@ contract OnAttest is AgreementAnchorTest {
 
   function testFuzz_RevertIf_AgreementIsRevoked(address _party, bytes32 _uid) public {
     vm.prank(resolver);
-    anchor.onRevoke();
+    anchor.onRevoke(partyA, bytes32(0));
 
     vm.prank(resolver);
     vm.expectRevert(AgreementAnchor.AgreementRevoked.selector);
@@ -116,12 +116,12 @@ contract OnRevoke is AgreementAnchorTest {
   function test_RevertIf_SenderIsNotResolver() public {
     vm.prank(other);
     vm.expectRevert("Only the EAS resolver can update state");
-    anchor.onRevoke();
+    anchor.onRevoke(partyA, bytes32(0));
   }
 
   function test_SetsDidEitherPartyRevoke() public {
     vm.prank(resolver);
-    anchor.onRevoke();
+    anchor.onRevoke(partyA, bytes32(0));
     assertTrue(anchor.didEitherPartyRevoke());
   }
 }

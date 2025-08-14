@@ -2,11 +2,11 @@
 pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
-import {AgreementFactory, IAgreementFactory} from "src/AgreementFactory.sol";
+import {AgreementAnchorFactory, IAgreementAnchorFactory} from "src/AgreementAnchorFactory.sol";
 import {AgreementAnchor} from "src/AgreementAnchor.sol";
 
-contract AgreementFactoryTest is Test {
-  AgreementFactory factory;
+contract AgreementAnchorFactoryTest is Test {
+  AgreementAnchorFactory factory;
 
   address resolver = makeAddr("resolver");
   address signer = makeAddr("signer");
@@ -14,21 +14,21 @@ contract AgreementFactoryTest is Test {
   function setUp() public virtual {
     vm.label(resolver, "Resolver");
     vm.label(signer, "Signer");
-    factory = new AgreementFactory(resolver, signer);
-    vm.label(address(factory), "AgreementFactory");
+    factory = new AgreementAnchorFactory(resolver, signer);
+    vm.label(address(factory), "AgreementAnchorFactory");
   }
 }
 
-contract Constructor is AgreementFactoryTest {
+contract Constructor is AgreementAnchorFactoryTest {
   function testFuzz_SetsInitialState(address _resolver, address _signer) public {
-    AgreementFactory _factory = new AgreementFactory(_resolver, _signer);
+    AgreementAnchorFactory _factory = new AgreementAnchorFactory(_resolver, _signer);
 
     assertEq(_factory.resolver(), _resolver);
     assertEq(_factory.signer(), _signer);
   }
 }
 
-contract CreateAgreementAnchor is AgreementFactoryTest {
+contract CreateAgreementAnchor is AgreementAnchorFactoryTest {
   function testFuzz_CreatesAndReturnsAgreementAnchorWithCorrectParameters(
     bytes32 _contentHash,
     address _counterSigner
@@ -46,7 +46,9 @@ contract CreateAgreementAnchor is AgreementFactoryTest {
 
     address anchorAddress = computeCreateAddress(address(factory), 1);
     vm.expectEmit();
-    emit IAgreementFactory.AgreementCreated(anchorAddress, _contentHash, signer, _counterSigner);
+    emit IAgreementAnchorFactory.AgreementCreated(
+      anchorAddress, _contentHash, signer, _counterSigner
+    );
     factory.createAgreementAnchor(_contentHash, _counterSigner);
   }
 }

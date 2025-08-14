@@ -2,20 +2,20 @@
 pragma solidity ^0.8.28;
 
 import {AgreementAnchor} from "src/AgreementAnchor.sol";
-import {IAgreementFactory} from "src/interfaces/IAgreementFactory.sol";
+import {IAgreementAnchorFactory} from "src/interfaces/IAgreementAnchorFactory.sol";
 
-/// @title AgreementFactory
+/// @title AgreementAnchorFactory
 /// @notice Factory for creating AgreementAnchors for some party `signer`
 /// @dev This factory is used by some fixed partyA (e.g. a DAO) to create AgreementAnchors for
 /// content hash <-> counterparty pairs.
-contract AgreementFactory is IAgreementFactory {
+contract AgreementAnchorFactory is IAgreementAnchorFactory {
   /// @notice The EAS AgreementResolver that deployed this factory.
   address public immutable resolver;
 
   /// @notice The principal signer for the created AgreementAnchors.
   address public immutable signer;
 
-  /// @inheritdoc IAgreementFactory
+  /// @inheritdoc IAgreementAnchorFactory
   mapping(address => bool) public isFactoryDeployed;
 
   /// @notice Constructor for the AgreementFactory.
@@ -26,7 +26,7 @@ contract AgreementFactory is IAgreementFactory {
     signer = _signer;
   }
 
-  /// @inheritdoc IAgreementFactory
+  /// @inheritdoc IAgreementAnchorFactory
   function createAgreementAnchor(bytes32 _contentHash, address _counterSigner)
     external
     returns (AgreementAnchor)

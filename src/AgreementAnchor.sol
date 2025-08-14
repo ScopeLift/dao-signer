@@ -1,18 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/// @title AgreementAnchor
+/// @notice An anchor for an agreement between two parties.
+/// @dev This anchor is used to store the content hash of the agreement and the UIDs of the latest
+/// attestations for each party.
+/// @dev This anchor is used in the recipient field of an EAS attestation.
 contract AgreementAnchor {
+  /// @notice The content hash of the agreement.
   bytes32 public immutable contentHash;
+  /// @notice The address of partyA.
   address public immutable partyA;
+  /// @notice The address of partyB.
   address public immutable partyB;
-  address public immutable resolver; // This anchor only trusts one resolver
+  /// @notice The address of the EAS resolver.
+  address public immutable resolver;
 
+  /// @notice The UID of the latest attestation for partyA.
   bytes32 public partyA_attestationUID;
+  /// @notice The UID of the latest attestation for partyB.
   bytes32 public partyB_attestationUID;
+  /// @notice Whether either party has revoked the agreement.
   bool public didEitherPartyRevoke;
 
+  /// @notice Emitted when a party has revoked their attestation.
+  event PartyRevoked(address indexed party, bytes32 indexed uid);
+
+  /// @notice Thrown when either party has revoked the agreement, and another attestation is made.
   error AgreementRevoked();
+  /// @notice Thrown when both parties have attested to the agreement, and another attestation is
+  /// made.
   error AgreementAlreadyAttested();
+  /// @notice Thrown when a party attests with this anchor but is not a party to the agreement.
   error NotAParty();
 
   modifier onlyResolver() {
@@ -47,7 +66,8 @@ contract AgreementAnchor {
   }
 
   /// @notice Called by the resolver to mark the anchor as revoked.
-  function onRevoke() external onlyResolver {
+  function onRevoke(address _party, bytes32 _uid) external onlyResolver {
     didEitherPartyRevoke = true;
+    emit PartyRevoked(_party, _uid);
   }
 }

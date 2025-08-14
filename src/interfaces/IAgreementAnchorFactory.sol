@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {AgreementAnchor} from "src/AgreementAnchor.sol";
 
-interface IAgreementFactory {
+interface IAgreementAnchorFactory {
   /// @notice Emitted when a new AgreementAnchor is created.
   /// @param agreement The address of the AgreementAnchor.
   /// @param contentHash The content hash for the agreement.

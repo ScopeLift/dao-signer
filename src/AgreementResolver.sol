@@ -4,16 +4,22 @@ pragma solidity ^0.8.28;
 import {SchemaResolver} from "eas-contracts/resolver/SchemaResolver.sol";
 import {IEAS, Attestation} from "eas-contracts/IEAS.sol";
 import {AgreementAnchor} from "src/AgreementAnchor.sol";
-import {AgreementFactory} from "src/AgreementFactory.sol";
+import {AgreementAnchorFactory} from "src/AgreementAnchorFactory.sol";
 
+/// @title AgreementResolver
+/// @notice A resolver for AgreementAnchor.
+/// @dev This resolver is used to create AgreementAnchors for some party `signer`
+/// @dev This resolver is used by some fixed partyA (e.g. a DAO) to create AgreementAnchors for
+/// content hash <-> counterparty pairs.
 contract AgreementResolver is SchemaResolver {
-  AgreementFactory public immutable factory;
+  /// @notice The factory that will be used to create AgreementAnchors for this resolver.
+  AgreementAnchorFactory public immutable factory;
 
   /// @notice Constructor for the AgreementResolver.
   /// @param eas The EAS instance to use for attestation storage.
   /// @param _signer The principal signer for the created AgreementAnchors.
   constructor(IEAS eas, address _signer) SchemaResolver(eas) {
-    factory = new AgreementFactory(address(this), _signer);
+    factory = new AgreementAnchorFactory(address(this), _signer);
   }
 
   /// @notice This hook is called from EAS when an attestation for this schema is made. It
@@ -83,7 +89,7 @@ contract AgreementResolver is SchemaResolver {
     if (
       attestation.uid == _anchor.partyA_attestationUID()
         || attestation.uid == _anchor.partyB_attestationUID()
-    ) _anchor.onRevoke();
+    ) _anchor.onRevoke(attestation.attester, attestation.uid);
 
     return true;
   }

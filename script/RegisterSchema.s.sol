@@ -15,7 +15,7 @@ abstract contract DeployAndRegisterSchema is Script {
     bytes32 namingUID;
   }
 
-  function config() public virtual returns (Config memory);
+  function config() internal virtual returns (Config memory);
 
   function run() public {
     vm.startBroadcast();

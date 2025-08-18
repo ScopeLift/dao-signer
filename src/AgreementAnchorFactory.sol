@@ -10,10 +10,10 @@ import {IAgreementAnchorFactory} from "src/interfaces/IAgreementAnchorFactory.so
 /// content hash <-> counterparty pairs.
 contract AgreementAnchorFactory is IAgreementAnchorFactory {
   /// @notice The EAS AgreementResolver that deployed this factory.
-  address public immutable resolver;
+  address public immutable RESOLVER;
 
   /// @notice The principal signer for the created AgreementAnchors.
-  address public immutable signer;
+  address public immutable SIGNER;
 
   /// @inheritdoc IAgreementAnchorFactory
   mapping(address => bool) public isFactoryDeployed;
@@ -22,8 +22,8 @@ contract AgreementAnchorFactory is IAgreementAnchorFactory {
   /// @param _resolver The EAS resolver that deployed this factory.
   /// @param _signer The principal signer for the AgreementAnchors.
   constructor(address _resolver, address _signer) {
-    resolver = _resolver;
-    signer = _signer;
+    RESOLVER = _resolver;
+    SIGNER = _signer;
   }
 
   /// @inheritdoc IAgreementAnchorFactory
@@ -32,9 +32,9 @@ contract AgreementAnchorFactory is IAgreementAnchorFactory {
     returns (AgreementAnchor)
   {
     AgreementAnchor agreementAnchor =
-      new AgreementAnchor(_contentHash, signer, _counterSigner, resolver);
+      new AgreementAnchor(_contentHash, SIGNER, _counterSigner, RESOLVER);
     isFactoryDeployed[address(agreementAnchor)] = true;
-    emit AgreementCreated(address(agreementAnchor), _contentHash, signer, _counterSigner);
+    emit AgreementCreated(address(agreementAnchor), _contentHash, SIGNER, _counterSigner);
     return agreementAnchor;
   }
 }

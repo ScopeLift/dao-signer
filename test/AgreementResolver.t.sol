@@ -39,7 +39,7 @@ contract AgreementResolverTest is Test {
 
     // Anchors for happy-path tests must now be created via the factory.
     // The factory's signer is partyA, and the counterSigner is partyB.
-    anchor = resolver.factory().createAgreementAnchor(contentHash, partyB);
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(contentHash, partyB);
 
     // Register a schema that uses our resolver
     schemaUID =
@@ -67,7 +67,7 @@ contract AgreementResolverTest is Test {
 
 contract OnAttest is AgreementResolverTest {
   function testFuzz_SuccessfullyAttestsForPartyA(bytes32 _contentHash) public {
-    anchor = resolver.factory().createAgreementAnchor(_contentHash, partyB);
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
     AttestationRequest memory request = _buildAttestationRequest(address(anchor), _contentHash);
 
     vm.prank(partyA);
@@ -77,7 +77,7 @@ contract OnAttest is AgreementResolverTest {
   }
 
   function testFuzz_SuccessfullyAttestsForPartyB(bytes32 _contentHash) public {
-    anchor = resolver.factory().createAgreementAnchor(_contentHash, partyB);
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
     AttestationRequest memory request = _buildAttestationRequest(address(anchor), _contentHash);
 
     vm.prank(partyB);
@@ -88,7 +88,7 @@ contract OnAttest is AgreementResolverTest {
 
   function testFuzz_RevertIf_AttesterIsNotAParty(address _attester, bytes32 _contentHash) public {
     vm.assume(_attester != partyA && _attester != partyB);
-    anchor = resolver.factory().createAgreementAnchor(_contentHash, partyB);
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
     AttestationRequest memory request = _buildAttestationRequest(address(anchor), _contentHash);
 
     vm.prank(_attester);
@@ -103,7 +103,7 @@ contract OnAttest is AgreementResolverTest {
   ) public {
     vm.assume(_contentHash != _wrongContentHash);
 
-    anchor = resolver.factory().createAgreementAnchor(_contentHash, partyB);
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
     AttestationRequest memory request = _buildAttestationRequest(address(anchor), _wrongContentHash);
 
     vm.prank(_isPartyA ? partyA : partyB);
@@ -131,7 +131,7 @@ contract OnAttest is AgreementResolverTest {
     bool _isPartyA
   ) public {
     vm.assume(_recipient != address(anchor));
-    anchor = new AgreementAnchor(_contentHash, partyA, partyB, address(resolver));
+    anchor = new AgreementAnchor(_contentHash, partyA, partyB, address(resolver.ANCHOR_FACTORY()));
     AttestationRequest memory request = _buildAttestationRequest(_recipient, _contentHash);
 
     vm.prank(_isPartyA ? partyA : partyB);
@@ -203,7 +203,7 @@ contract OnRevoke is AgreementResolverTest {
       schemaRegistry.register("bytes32 contentHash", ISchemaResolver(address(resolver2)), true);
 
     // Create a new anchor with the second resolver's factory
-    AgreementAnchor anchor = resolver2.factory().createAgreementAnchor(contentHash, partyB);
+    AgreementAnchor anchor = resolver2.ANCHOR_FACTORY().createAgreementAnchor(contentHash, partyB);
 
     // Create an attestation with this schema
     AttestationRequest memory attestRequest = _buildAttestationRequest(address(anchor), contentHash);

@@ -16,13 +16,13 @@ import {AgreementAnchorFactory} from "src/AgreementAnchorFactory.sol";
 /// create AgreementAnchors for different counterparty addresses.
 contract AgreementResolver is SchemaResolver {
   /// @notice The factory that will be used to create AgreementAnchors for this resolver.
-  AgreementAnchorFactory public immutable factory;
+  AgreementAnchorFactory public immutable ANCHOR_FACTORY;
 
   /// @notice Constructor for the AgreementResolver.
   /// @param eas The EAS instance to use for attestation storage.
   /// @param _signer The principal signer for the created AgreementAnchors.
   constructor(IEAS eas, address _signer) SchemaResolver(eas) {
-    factory = new AgreementAnchorFactory(address(this), _signer);
+    ANCHOR_FACTORY = new AgreementAnchorFactory(address(this), _signer);
   }
 
   /// @notice This hook is called from EAS when an attestation for this schema is made. It
@@ -56,7 +56,7 @@ contract AgreementResolver is SchemaResolver {
     anchor = AgreementAnchor(attestation.recipient);
 
     // The anchor must have been deployed by this factory
-    require(factory.isFactoryDeployed(address(anchor)), "Not a factory-deployed anchor");
+    require(ANCHOR_FACTORY.isFactoryDeployed(address(anchor)), "Not a factory-deployed anchor");
 
     // The attester must be one of the two parties defined in the anchor
     require(

@@ -15,7 +15,7 @@ contract MainnetConfig is DeployAndRegisterSchema {
   bytes32 public constant NAMING_UID =
     0x44d562ac1d7cd77e232978687fea027ace48f719cf1d58c7888e509663bb87fc;
 
-  function config() public pure override returns (Config memory) {
+  function config() internal pure override returns (Config memory) {
     return Config({
       eas: EAS_ADDRESS,
       schemaRegistry: SCHEMA_REGISTRY,

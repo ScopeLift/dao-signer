@@ -23,8 +23,8 @@ contract Constructor is AgreementAnchorFactoryTest {
   function testFuzz_SetsInitialState(address _resolver, address _signer) public {
     AgreementAnchorFactory _factory = new AgreementAnchorFactory(_resolver, _signer);
 
-    assertEq(_factory.resolver(), _resolver);
-    assertEq(_factory.signer(), _signer);
+    assertEq(_factory.RESOLVER(), _resolver);
+    assertEq(_factory.SIGNER(), _signer);
   }
 }
 

@@ -2,9 +2,7 @@
   evm_version = "cancun"
   optimizer = true
   optimizer_runs = 10_000_000
-  remappings = [
-    "openzeppelin-contracts=lib/openzeppelin-contracts",
-  ]
+  remappings = ["openzeppelin-contracts=lib/openzeppelin-contracts"]
   verbosity = 3
 
 [profile.ci]
@@ -33,7 +31,7 @@
   wrap_comments = true
 
 [rpc_endpoints]
-sepolia = "${SEPOLIA_RPC_URL}"
+  sepolia = "${SEPOLIA_RPC_URL}"
 
 [etherscan]
-sepolia = { key = "${ETHERSCAN_API_KEY}" }
+  sepolia = { key = "${ETHERSCAN_API_KEY}" }

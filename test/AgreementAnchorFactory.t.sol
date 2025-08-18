@@ -35,10 +35,15 @@ contract CreateAgreementAnchor is AgreementAnchorFactoryTest {
   ) public {
     AgreementAnchor anchor = factory.createAgreementAnchor(_contentHash, _counterSigner);
 
-    assertEq(anchor.contentHash(), _contentHash);
-    assertEq(anchor.partyA(), signer);
-    assertEq(anchor.partyB(), _counterSigner);
-    assertEq(anchor.resolver(), resolver);
+    assertEq(anchor.CONTENT_HASH(), _contentHash);
+    assertEq(anchor.PARTY_A(), signer);
+    assertEq(anchor.PARTY_B(), _counterSigner);
+    assertEq(anchor.RESOLVER(), resolver);
+  }
+
+  function testFuzz_SetsIsFactoryDeployed(bytes32 _contentHash, address _counterSigner) public {
+    AgreementAnchor anchor = factory.createAgreementAnchor(_contentHash, _counterSigner);
+    assertTrue(factory.isFactoryDeployed(address(anchor)));
   }
 
   function testFuzz_EmitsAgreementCreatedEvent(bytes32 _contentHash, address _counterSigner) public {

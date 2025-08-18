@@ -5,7 +5,7 @@ import {DeployAndRegisterSchema} from "../RegisterSchema.s.sol";
 
 contract SepoliaConfig is DeployAndRegisterSchema {
   // DAO-related config
-  string public constant SCHEMA_NAME = "Sandboxed Agreement";
+  string public constant SCHEMA_NAME = "Agreement with Ed";
   address public constant PRIMARY_SIGNER = 0xaecd4410c9b69E34F4365bc2FBd489675F739d83;
 
   // EAS-related config

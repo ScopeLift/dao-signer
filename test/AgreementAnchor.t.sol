@@ -37,10 +37,10 @@ contract Constructor is AgreementAnchorTest {
   ) public {
     _deployAnchor(_contentHash, _partyA, _partyB, _resolver);
 
-    assertEq(anchor.contentHash(), _contentHash);
-    assertEq(anchor.partyA(), _partyA);
-    assertEq(anchor.partyB(), _partyB);
-    assertEq(anchor.resolver(), _resolver);
+    assertEq(anchor.CONTENT_HASH(), _contentHash);
+    assertEq(anchor.PARTY_A(), _partyA);
+    assertEq(anchor.PARTY_B(), _partyB);
+    assertEq(anchor.RESOLVER(), _resolver);
     assertEq(anchor.partyA_attestationUID(), bytes32(0));
     assertEq(anchor.partyB_attestationUID(), bytes32(0));
     assertFalse(anchor.didEitherPartyRevoke());
@@ -51,16 +51,6 @@ contract OnAttest is AgreementAnchorTest {
   function setUp() public override {
     super.setUp();
     _deployAnchor(contentHash, partyA, partyB, resolver);
-  }
-
-  function testFuzz_RevertIf_SenderIsNotResolver(address _sender, address _party, bytes32 _uid)
-    public
-  {
-    vm.assume(_sender != resolver);
-
-    vm.prank(_sender);
-    vm.expectRevert("Only the EAS resolver can update state");
-    anchor.onAttest(_party, _uid);
   }
 
   function testFuzz_ResolverCanUpdatePartyAAttestationUID(bytes32 _uid) public {
@@ -78,8 +68,18 @@ contract OnAttest is AgreementAnchorTest {
   function testFuzz_RevertIf_AttestationForNonParty(address _notParty, bytes32 _uid) public {
     vm.assume(_notParty != partyA && _notParty != partyB);
     vm.prank(resolver);
-    vm.expectRevert(AgreementAnchor.NotAParty.selector);
+    vm.expectRevert(AgreementAnchor.AgreementAnchor__NotAParty.selector);
     anchor.onAttest(_notParty, _uid);
+  }
+
+  function testFuzz_RevertIf_SenderIsNotResolver(address _sender, address _party, bytes32 _uid)
+    public
+  {
+    vm.assume(_sender != resolver);
+
+    vm.prank(_sender);
+    vm.expectRevert("Only the EAS resolver can update state");
+    anchor.onAttest(_party, _uid);
   }
 
   function testFuzz_RevertIf_AgreementIsRevoked(address _party, bytes32 _uid) public {
@@ -87,7 +87,7 @@ contract OnAttest is AgreementAnchorTest {
     anchor.onRevoke(partyA, bytes32(0));
 
     vm.prank(resolver);
-    vm.expectRevert(AgreementAnchor.AgreementRevoked.selector);
+    vm.expectRevert(AgreementAnchor.AgreementAnchor__AgreementRevoked.selector);
     anchor.onAttest(_party, _uid);
   }
 
@@ -102,7 +102,7 @@ contract OnAttest is AgreementAnchorTest {
     anchor.onAttest(partyB, _uid2);
 
     vm.prank(resolver);
-    vm.expectRevert(AgreementAnchor.AgreementAlreadyAttested.selector);
+    vm.expectRevert(AgreementAnchor.AgreementAnchor__AgreementAlreadyAttested.selector);
     anchor.onAttest(partyA, _uid3);
   }
 }
@@ -113,15 +113,17 @@ contract OnRevoke is AgreementAnchorTest {
     _deployAnchor(contentHash, partyA, partyB, resolver);
   }
 
-  function test_RevertIf_SenderIsNotResolver() public {
-    vm.prank(other);
-    vm.expectRevert("Only the EAS resolver can update state");
-    anchor.onRevoke(partyA, bytes32(0));
+  function testFuzz_SetsDidEitherPartyRevoke(bytes32 _uid) public {
+    vm.prank(resolver);
+    anchor.onRevoke(partyA, _uid);
+    assertTrue(anchor.didEitherPartyRevoke());
   }
 
-  function test_SetsDidEitherPartyRevoke() public {
-    vm.prank(resolver);
-    anchor.onRevoke(partyA, bytes32(0));
-    assertTrue(anchor.didEitherPartyRevoke());
+  function test_RevertIf_SenderIsNotResolver(address _sender, bytes32 _uid) public {
+    vm.assume(_sender != resolver);
+
+    vm.prank(_sender);
+    vm.expectRevert("Only the EAS resolver can update state");
+    anchor.onRevoke(partyA, _uid);
   }
 }

@@ -7,10 +7,13 @@ import {AgreementAnchor} from "src/AgreementAnchor.sol";
 import {AgreementAnchorFactory} from "src/AgreementAnchorFactory.sol";
 
 /// @title AgreementResolver
-/// @notice A resolver for AgreementAnchor.
+/// @notice An EAS resolver for AgreementAnchors. These hooks are called from EAS when an
+/// attestation or revocation is made. They ensure that the attestation is from a party to the
+/// agreement, and that the content hash matches the anchor.
 /// @dev This resolver is used to create AgreementAnchors for some party `signer`
 /// @dev This resolver is used by some fixed partyA (e.g. a DAO) to create AgreementAnchors for
-/// content hash <-> counterparty pairs.
+/// content hash <-> counterparty pairs. It is deployed with a fixed signer, and then used to
+/// create AgreementAnchors for different counterparty addresses.
 contract AgreementResolver is SchemaResolver {
   /// @notice The factory that will be used to create AgreementAnchors for this resolver.
   AgreementAnchorFactory public immutable factory;
@@ -57,12 +60,12 @@ contract AgreementResolver is SchemaResolver {
 
     // The attester must be one of the two parties defined in the anchor
     require(
-      attester == anchor.partyA() || attester == anchor.partyB(), "Not a party to this agreement"
+      attester == anchor.PARTY_A() || attester == anchor.PARTY_B(), "Not a party to this agreement"
     );
 
     // Attestation content hash must match anchor content hash
     require(
-      abi.decode(attestation.data, (bytes32)) == anchor.contentHash(),
+      abi.decode(attestation.data, (bytes32)) == anchor.CONTENT_HASH(),
       "Attestation data does not match the anchor"
     );
 

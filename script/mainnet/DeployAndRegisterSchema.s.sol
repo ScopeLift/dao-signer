@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {DeployAndRegisterSchema} from "../RegisterSchema.s.sol";
+import {DeployAndRegisterSchema} from "script/script-base/DeployAndRegisterSchema.sol";
 
 contract MainnetConfig is DeployAndRegisterSchema {
   // DAO-related config
@@ -23,5 +23,9 @@ contract MainnetConfig is DeployAndRegisterSchema {
       namingUID: NAMING_UID,
       primarySigner: PRIMARY_SIGNER
     });
+  }
+
+  function run() public override {
+    super.run();
   }
 }

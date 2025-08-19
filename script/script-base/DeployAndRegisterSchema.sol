@@ -17,7 +17,7 @@ abstract contract DeployAndRegisterSchema is Script {
 
   function config() internal virtual returns (Config memory);
 
-  function run() public {
+  function run() public virtual {
     vm.startBroadcast();
 
     IEAS eas = IEAS(config().eas);

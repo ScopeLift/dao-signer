@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {DeployAndRegisterSchema} from "../RegisterSchema.s.sol";
+import {DeployAndRegisterSchema} from "script/script-base/DeployAndRegisterSchema.sol";
 
 contract SepoliaConfig is DeployAndRegisterSchema {
   // DAO-related config
@@ -22,5 +22,9 @@ contract SepoliaConfig is DeployAndRegisterSchema {
       namingUID: NAMING_UID,
       primarySigner: PRIMARY_SIGNER
     });
+  }
+
+  function run() public override {
+    super.run();
   }
 }

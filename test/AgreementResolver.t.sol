@@ -65,6 +65,13 @@ contract AgreementResolverTest is Test {
   }
 }
 
+contract Constructor is AgreementResolverTest {
+  function testFuzz_deploysAnchorFactoryWithCorrectSigner(address _signer) public {
+    AgreementResolver resolver2 = new AgreementResolver(IEAS(address(eas)), _signer);
+    assertEq(resolver2.ANCHOR_FACTORY().SIGNER(), _signer);
+  }
+}
+
 contract OnAttest is AgreementResolverTest {
   function testFuzz_SuccessfullyAttestsForPartyA(bytes32 _contentHash) public {
     anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
@@ -155,11 +162,20 @@ contract OnRevoke is AgreementResolverTest {
       RevocationRequest({schema: schemaUID, data: RevocationRequestData({uid: _uid, value: 0})});
   }
 
-  function test_SuccessfullyRevokesAnchorWhenLatestUIDIsRevoked() public {
-    RevocationRequest memory request = _buildRevocationRequest(partyA_uid);
+  function testFuzz_SuccessfullyRevokesAnchorWhenLatestUIDIsRevoked(
+    bool _isPartyA,
+    bytes32 _contentHash
+  ) public {
+    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
+    AttestationRequest memory attestRequest =
+      _buildAttestationRequest(address(anchor), _contentHash);
+    vm.startPrank(_isPartyA ? partyA : partyB);
+    bytes32 uid = eas.attest(attestRequest);
 
-    vm.prank(partyA);
+    RevocationRequest memory request = _buildRevocationRequest(uid);
+
     eas.revoke(request);
+    vm.stopPrank();
 
     assertTrue(anchor.didEitherPartyRevoke());
   }

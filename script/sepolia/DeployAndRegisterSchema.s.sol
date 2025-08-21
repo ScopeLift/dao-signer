@@ -5,7 +5,7 @@ import {DeployAndRegisterSchema} from "script/script-base/DeployAndRegisterSchem
 
 contract SepoliaConfig is DeployAndRegisterSchema {
   // DAO-related config
-  string public constant SCHEMA_NAME = "Agreement with Ed";
+  string public constant SCHEMA_NAME = "Agreement with Ed v2";
   address public constant PRIMARY_SIGNER = 0xaecd4410c9b69E34F4365bc2FBd489675F739d83;
 
   // EAS-related config

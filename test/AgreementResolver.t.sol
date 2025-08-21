@@ -37,13 +37,13 @@ contract AgreementResolverTest is Test {
     eas = new EAS(ISchemaRegistry(address(schemaRegistry)));
     resolver = new AgreementResolver(IEAS(address(eas)), partyA);
 
-    // Anchors for happy-path tests must now be created via the factory.
+    // Anchors for happy-path tests must be created via the factory.
     // The factory's signer is partyA, and the counterSigner is partyB.
     anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(contentHash, partyB);
 
     // Register a schema that uses our resolver
     schemaUID =
-      schemaRegistry.register("bytes32 contentHash", ISchemaResolver(address(resolver)), true);
+      schemaRegistry.register("bytes32 contentHash", ISchemaResolver(address(resolver)), false);
   }
 
   function _buildAttestationRequest(address _recipient, bytes32 _data)
@@ -56,7 +56,7 @@ contract AgreementResolverTest is Test {
       data: AttestationRequestData({
         recipient: _recipient,
         expirationTime: 0,
-        revocable: true,
+        revocable: false,
         refUID: bytes32(0),
         data: abi.encode(_data),
         value: 0
@@ -66,9 +66,14 @@ contract AgreementResolverTest is Test {
 }
 
 contract Constructor is AgreementResolverTest {
-  function testFuzz_deploysAnchorFactoryWithCorrectSigner(address _signer) public {
+  function testFuzz_DeploysAnchorFactoryWithCorrectSigner(address _signer) public {
     AgreementResolver resolver2 = new AgreementResolver(IEAS(address(eas)), _signer);
     assertEq(resolver2.ANCHOR_FACTORY().SIGNER(), _signer);
+  }
+
+  function testFuzz_StoresCorrectSchemaUID() public {
+    assertEq(schemaRegistry.getSchema(schemaUID).uid, resolver.AGREEMENT_SCHEMA_UID());
+    assertEq(schemaRegistry.getSchema(schemaUID).schema, resolver.AGREEMENT_SCHEMA());
   }
 }
 
@@ -118,6 +123,28 @@ contract OnAttest is AgreementResolverTest {
     eas.attest(request);
   }
 
+  function test_RevertIf_IncorrectSchemaUID() public {
+    bytes32 incorrectSchemaUID = schemaRegistry.register(
+      "bytes32 contentHash,string note", ISchemaResolver(address(resolver)), false
+    );
+    AttestationRequest memory request = _buildAttestationRequest(address(anchor), contentHash);
+    request.schema = incorrectSchemaUID; // Use an incorrect schema UID
+
+    vm.prank(partyA);
+    vm.expectRevert("Incorrect schema UID");
+    eas.attest(request);
+  }
+
+  function testFuzz_RevertIf_AttestationHasExpiration(uint64 _expirationTime) public {
+    _expirationTime = uint64(bound(_expirationTime, vm.getBlockTimestamp() + 1, type(uint64).max));
+    AttestationRequest memory request = _buildAttestationRequest(address(anchor), contentHash);
+    request.data.expirationTime = _expirationTime; // Set a non-zero expiration time
+
+    vm.prank(partyA);
+    vm.expectRevert("Attestation must not have an expiration");
+    eas.attest(request);
+  }
+
   function test_RevertIf_AnchorNotDeployedByFactory() public {
     // Manually create an anchor, not using the factory
     AgreementAnchor nonFactoryAnchor =
@@ -142,97 +169,8 @@ contract OnAttest is AgreementResolverTest {
     AttestationRequest memory request = _buildAttestationRequest(_recipient, _contentHash);
 
     vm.prank(_isPartyA ? partyA : partyB);
-    vm.expectRevert();
+    // vm.expectRevert();
+    vm.expectRevert("Not a factory-deployed anchor");
     eas.attest(request);
-  }
-}
-
-contract OnRevoke is AgreementResolverTest {
-  bytes32 partyA_uid;
-
-  function setUp() public override {
-    super.setUp();
-    AttestationRequest memory request = _buildAttestationRequest(address(anchor), contentHash);
-    vm.prank(partyA);
-    partyA_uid = eas.attest(request);
-  }
-
-  function _buildRevocationRequest(bytes32 _uid) internal view returns (RevocationRequest memory) {
-    return
-      RevocationRequest({schema: schemaUID, data: RevocationRequestData({uid: _uid, value: 0})});
-  }
-
-  function testFuzz_SuccessfullyRevokesAnchorWhenLatestUIDIsRevoked(
-    bool _isPartyA,
-    bytes32 _contentHash
-  ) public {
-    anchor = resolver.ANCHOR_FACTORY().createAgreementAnchor(_contentHash, partyB);
-    AttestationRequest memory attestRequest =
-      _buildAttestationRequest(address(anchor), _contentHash);
-    vm.startPrank(_isPartyA ? partyA : partyB);
-    bytes32 uid = eas.attest(attestRequest);
-
-    RevocationRequest memory request = _buildRevocationRequest(uid);
-
-    eas.revoke(request);
-    vm.stopPrank();
-
-    assertTrue(anchor.didEitherPartyRevoke());
-  }
-
-  function test_DoesNotRevokeAnchorIfRevokedUIDIsNotTheLatest() public {
-    // partyA makes a second, later attestation. This UID will be stored in the anchor.
-    AttestationRequest memory secondRequest = _buildAttestationRequest(address(anchor), contentHash);
-    vm.prank(partyA);
-    bytes32 partyA_second_uid = eas.attest(secondRequest);
-
-    // Now, revoke the first attestation.
-    // The resolver should allow this, but not mark the anchor as revoked.
-    RevocationRequest memory firstRevocationRequest = _buildRevocationRequest(partyA_uid);
-    vm.prank(partyA);
-    eas.revoke(firstRevocationRequest);
-
-    // The anchor should NOT be revoked because partyA_uid is not the latest attestation.
-    assertFalse(anchor.didEitherPartyRevoke(), "Anchor should not be revoked for an old UID");
-
-    // Now, revoke the latest one.
-    RevocationRequest memory secondRevocationRequest = _buildRevocationRequest(partyA_second_uid);
-    vm.prank(partyA);
-    eas.revoke(secondRevocationRequest);
-
-    // The anchor SHOULD now be revoked.
-    assertTrue(anchor.didEitherPartyRevoke(), "Anchor should be revoked for the latest UID");
-  }
-
-  function test_RevertIf_RevokerIsNotAParty() public {
-    RevocationRequest memory request = _buildRevocationRequest(partyA_uid);
-
-    vm.prank(other);
-    vm.expectRevert();
-    eas.revoke(request);
-  }
-
-  function test_RevertIf_RevokedFromNonFactoryAnchor() public {
-    // Create a second resolver. It will have its own factory.
-    AgreementResolver resolver2 = new AgreementResolver(IEAS(address(eas)), partyA);
-    bytes32 schemaUID2 =
-      schemaRegistry.register("bytes32 contentHash", ISchemaResolver(address(resolver2)), true);
-
-    // Create a new anchor with the second resolver's factory
-    AgreementAnchor anchor = resolver2.ANCHOR_FACTORY().createAgreementAnchor(contentHash, partyB);
-
-    // Create an attestation with this schema
-    AttestationRequest memory attestRequest = _buildAttestationRequest(address(anchor), contentHash);
-    attestRequest.schema = schemaUID2;
-    vm.prank(partyA);
-    bytes32 uid = eas.attest(attestRequest);
-
-    // Attempt to revoke the attestation using our test contract resolver's schema.
-    // EAS will revert because the schema does not match the attestation.
-    RevocationRequest memory revokeRequest =
-      RevocationRequest({schema: schemaUID, data: RevocationRequestData({uid: uid, value: 0})});
-    vm.prank(partyA);
-    vm.expectRevert(EAS.InvalidSchema.selector);
-    eas.revoke(revokeRequest);
   }
 }

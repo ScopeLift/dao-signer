@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 /// @title AgreementAnchor
 /// @notice An anchor for an agreement between two parties.
-/// @dev This anchor is used to store the content hash of the agreement and the UIDs of the latest
+/// @dev This anchor is used to store the content hash of the agreement and the UIDs of the
 /// attestations for each party.
 /// @dev This anchor is used in the recipient field of an EAS attestation.
 contract AgreementAnchor {
@@ -20,18 +20,10 @@ contract AgreementAnchor {
   bytes32 public partyA_attestationUID;
   /// @notice The UID of the latest attestation for partyB.
   bytes32 public partyB_attestationUID;
-  /// @notice Whether either party has revoked the agreement.
-  bool public didEitherPartyRevoke;
 
-  /// @notice Emitted when a party has revoked their attestation.
-  event PartyRevoked(address indexed party, bytes32 indexed uid);
-
-  /// @notice Thrown when either party has revoked the agreement, and another attestation is made.
-  error AgreementAnchor__AgreementRevoked();
-  /// @notice Thrown when both parties have attested to the agreement, and another attestation is
-  /// made.
-  error AgreementAnchor__AgreementAlreadyAttested();
-  /// @notice Thrown when a party attests with this anchor but is not a party to the agreement.
+  /// @notice Thrown when a party attests on this anchor but has already attested.
+  error AgreementAnchor__AlreadyAttested();
+  /// @notice Thrown when a party attests on this anchor but is not a party to the agreement.
   error AgreementAnchor__NotAParty();
 
   modifier onlyResolver() {
@@ -55,19 +47,15 @@ contract AgreementAnchor {
   /// @param party The party that is being attested to.
   /// @param uid The UID of the attestation.
   function onAttest(address party, bytes32 uid) external onlyResolver {
-    if (didEitherPartyRevoke) revert AgreementAnchor__AgreementRevoked();
-    if (partyA_attestationUID != 0x0 && partyB_attestationUID != 0x0) {
-      revert AgreementAnchor__AgreementAlreadyAttested();
+    if (party == PARTY_A) {
+      if (partyA_attestationUID != 0x0) revert AgreementAnchor__AlreadyAttested();
+      partyA_attestationUID = uid;
+    } else if (party == PARTY_B) {
+      if (partyB_attestationUID != 0x0) revert AgreementAnchor__AlreadyAttested();
+      partyB_attestationUID = uid;
+    } else {
+      // should never get here, as resolver has already checked
+      revert AgreementAnchor__NotAParty();
     }
-    if (party == PARTY_A) partyA_attestationUID = uid;
-    else if (party == PARTY_B) partyB_attestationUID = uid;
-    // should never get here, as resolver has already checked
-    else revert AgreementAnchor__NotAParty();
-  }
-
-  /// @notice Called by the resolver to mark the anchor as revoked.
-  function onRevoke(address _party, bytes32 _uid) external onlyResolver {
-    didEitherPartyRevoke = true;
-    emit PartyRevoked(_party, _uid);
   }
 }

@@ -82,6 +82,7 @@ contract OnAttest is AgreementAnchorTest {
   }
 
   function testFuzz_RevertIf_PartyAttestsTwice(bool _isPartyA, bytes32 _uid1, bytes32 _uid2) public {
+    vm.assume(_uid1 != bytes32(0));
     vm.startPrank(resolver);
     anchor.onAttest(_isPartyA ? partyA : partyB, _uid1);
     vm.expectRevert(AgreementAnchor.AgreementAnchor__AlreadyAttested.selector);

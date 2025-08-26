@@ -27,8 +27,8 @@ abstract contract DeployAndRegisterSchema is Script {
     AgreementResolver resolver = new AgreementResolver(eas, config().primarySigner);
 
     // Deploy the schema
-    string memory schema = "bytes32 hashOfDocument,string note";
-    bytes32 schemaHash = schemaRegistry.register(schema, resolver, true);
+    string memory schema = "bytes32 contentHash";
+    bytes32 schemaHash = schemaRegistry.register(schema, resolver, false);
 
     AttestationRequest memory nameAttestation = AttestationRequest({
       schema: config().namingUID,

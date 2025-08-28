@@ -72,9 +72,10 @@ contract CreateProposal is Script {
   address public COWRIE_AGREEMENT_ANCHOR = address(0x22005982Ae6BD2E90167F34a4604FfD59AFa7E9d);
   address public UF_AGREEMENT_ANCHOR = address(0x64aCa2CE7e855a3C64E1Da32D927eD07bAC40718);
 
-  bytes32 AGREEMENT_SCHEMA_UID = AgreementResolver(
-    payable(AgreementAnchor(SOLO_AGREEMENT_ANCHOR).RESOLVER())
-  ).AGREEMENT_SCHEMA_UID();
+  bytes32 public AGREEMENT_SCHEMA_UID = SOLO_AGREEMENT_ANCHOR.code.length == 0
+    ? bytes32(0)
+    : AgreementResolver(payable(AgreementAnchor(SOLO_AGREEMENT_ANCHOR).RESOLVER()))
+      .AGREEMENT_SCHEMA_UID();
 
   // Content hashes
   bytes32 constant SOLO_CONTENT_HASH =

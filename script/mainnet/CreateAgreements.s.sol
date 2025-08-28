@@ -4,8 +4,7 @@ pragma solidity ^0.8.30;
 import {CreateAgreements} from "script/script-base/CreateAgreements.sol";
 
 contract MainnetCreateAgreements is CreateAgreements {
-  // TODO: Replace this with the new address of the deployed AgreementAnchorFactory.
-  address FACTORY_ADDRESS = address(0);
+  address FACTORY_ADDRESS = address(0x5Ef3cCf9eC7E0af61E1767b2EEbB50e052b5Df47);
 
   uint256 public constant N_AGREEMENTS = 3;
 

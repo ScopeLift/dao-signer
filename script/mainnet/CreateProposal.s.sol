@@ -5,6 +5,8 @@ import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
 import {IEAS, AttestationRequest, AttestationRequestData} from "eas-contracts/IEAS.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {AgreementAnchor} from "src/AgreementAnchor.sol";
+import {AgreementResolver} from "src/AgreementResolver.sol";
 
 interface IGovernorBravo {
   function propose(
@@ -38,6 +40,24 @@ interface IGovernorBravo {
 ///      and the resulting AgreementAnchor addresses are known and provided as constants.
 contract CreateProposal is Script {
   // =============================================================
+  //      Proposal TODOs
+  // =============================================================
+
+  // TODO: Update the proposal description
+  string internal constant PROPOSAL_DESCRIPTION =
+    "Proposal to Finalize DUNI Service Provider Agreements and Fund Operations";
+
+  // TODO: VERIFY the correct recipient address for Cowrie.
+  address public constant COWRIE_RECIPIENT = 0x96855185279B526D7ad7e4A21B3f8d4f8Ca859da;
+  address public constant DUNI_SAFE = 0x2D994F6BCB8165eEE9e711af3eA9e92863E35a7A;
+
+  // TODO: Update these values with the final UNI amounts calculated on Sunday.
+  // Represents $75k worth of UNI.
+  uint256 public constant UNI_AMOUNT_COWRIE = 7623.54 * 1e18;
+  // Represents $16.5m worth of UNI.
+  uint256 public constant UNI_AMOUNT_DUNI_SAFE = 1_677_178 * 1e18;
+
+  // =============================================================
   //      Protocol & Governance Constants
   // =============================================================
   IGovernorBravo internal constant GOVERNOR_BRAVO =
@@ -48,15 +68,13 @@ contract CreateProposal is Script {
   // =============================================================
   //      Agreement Anchor Constants
   // =============================================================
-  // TODO: Replace these placeholder addresses with the actual addresses of the deployed
-  // AgreementAnchors.
-  address SOLO_AGREEMENT_ANCHOR = address(0x0000000000000000000000000000000000000001);
-  address COWRIE_AGREEMENT_ANCHOR = address(0x0000000000000000000000000000000000000002);
-  address UF_AGREEMENT_ANCHOR = address(0x0000000000000000000000000000000000000003);
+  address public SOLO_AGREEMENT_ANCHOR = address(0xe4b69D68341abBdd08023cD39bAe9a0D5360B6c1);
+  address public COWRIE_AGREEMENT_ANCHOR = address(0x22005982Ae6BD2E90167F34a4604FfD59AFa7E9d);
+  address public UF_AGREEMENT_ANCHOR = address(0x64aCa2CE7e855a3C64E1Da32D927eD07bAC40718);
 
-  // TODO: Replace with the UID of the schema registered by `DeployAndRegisterSchema.s.sol`.
-  bytes32 AGREEMENT_SCHEMA_UID =
-    bytes32(0x0000000000000000000000000000000000000000000000000000000000000004);
+  bytes32 AGREEMENT_SCHEMA_UID = AgreementResolver(
+    payable(AgreementAnchor(SOLO_AGREEMENT_ANCHOR).RESOLVER())
+  ).AGREEMENT_SCHEMA_UID();
 
   // Content hashes
   bytes32 constant SOLO_CONTENT_HASH =
@@ -66,32 +84,18 @@ contract CreateProposal is Script {
   bytes32 constant UF_CONTENT_HASH =
     0xa2fd33dd87091d25c15d94c0097395c08f2689efe6a2f8c53a1194222e442dd5;
 
-  // =============================================================
-  //      Financial & Recipient Constants
-  // =============================================================
-  // TODO: Replace with the correct recipient address for Cowrie.
-  address public constant COWRIE_RECIPIENT = address(bytes20("cowrie"));
-  address public constant DUNI_SAFE = 0x2D994F6BCB8165eEE9e711af3eA9e92863E35a7A;
-
-  // TODO: Update these values with the final UNI amounts calculated on Sunday.
-  // Represents $75k worth of UNI.
-  uint256 public constant UNI_AMOUNT_COWRIE = 10_000 * 1e18;
-  // Represents $16.5m worth of UNI.
-  uint256 public constant UNI_AMOUNT_DUNI_SAFE = 2_000_000 * 1e18;
-
   function run() public returns (uint256 proposalId) {
     // --- Proposal Actions Setup ---
     address[] memory targets = new address[](5);
     uint256[] memory values = new uint256[](5);
     string[] memory signatures = new string[](5);
     bytes[] memory calldatas = new bytes[](5);
-    string memory description =
-      "Proposal to Finalize DUNI Service Provider Agreements and Fund Operations";
+    string memory description = PROPOSAL_DESCRIPTION;
 
     // --- Action 1: Attest to the Solo Agreement ---
     targets[0] = address(EAS);
     values[0] = 0;
-    signatures[0] = ""; // GovernorBravo allows empty signatures when calldata has selector
+    signatures[0] = "";
     AttestationRequest memory soloAttestationRequest =
       _buildAttestationRequest(SOLO_AGREEMENT_ANCHOR, SOLO_CONTENT_HASH);
     calldatas[0] = abi.encodeCall(IEAS.attest, (soloAttestationRequest));

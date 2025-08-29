@@ -43,10 +43,6 @@ contract CreateProposal is Script {
   //      Proposal TODOs
   // =============================================================
 
-  // TODO: Update the proposal description
-  string internal constant PROPOSAL_DESCRIPTION =
-    "Proposal to Finalize DUNI Service Provider Agreements and Fund Operations";
-
   // TODO: VERIFY the correct recipient address for Cowrie.
   address public constant COWRIE_RECIPIENT = 0x96855185279B526D7ad7e4A21B3f8d4f8Ca859da;
   address public constant DUNI_SAFE = 0x2D994F6BCB8165eEE9e711af3eA9e92863E35a7A;
@@ -56,6 +52,46 @@ contract CreateProposal is Script {
   uint256 public constant UNI_AMOUNT_COWRIE = 7623.54 * 1e18;
   // Represents $16.5m worth of UNI.
   uint256 public constant UNI_AMOUNT_DUNI_SAFE = 1_677_178 * 1e18;
+
+  // TODO: Confirm proposal description
+  string internal constant PROPOSAL_DESCRIPTION =
+    "# Summary \
+\
+The Uniswap Foundation (\"UF\") proposes that Uniswap Governance adopt a Wyoming-registered Decentralized Unincorporated Nonprofit Association (\"DUNA\") as the legal structure for the Uniswap Governance Protocol. This new legal entity, called \"DUNI\", will be purpose-built to preserve Uniswap's decentralized governance structure while enabling engagement with the offchain world (e.g., entering into contracts, retaining service providers, and fulfilling any potential regulatory and tax responsibilities). \
+\
+If adopted, DUNI will be a legal entity for Uniswap Governance that recognizes the binding validity of onchain Governance Proposals with the intention of providing certainty regarding its legal structure and intended liability protections for members of DUNI. Adopting DUNI does not, in any way, alter the Uniswap Protocol, the UNI token, or the core mechanics of onchain governance. Rather, it represents a significant step in equipping Uniswap Governance for the future. \
+\
+Importantly, establishing Uniswap Governance as a DUNA would bolster critical limited liability protections for governance participants. This step is intended to protect governance participants from potential personal exposure to possible legal or tax liabilities stemming from the collective action taken by Uniswap Governance. This is a critical step in de-risking engagement in Uniswap Governance without compromising decentralization. \
+\
+## Background & Motivation \
+\
+In the Uniswap Unleashed roadmap, we described a vision for evolving Uniswap Governance. In this vision, Governance can turn on the protocol fee, fund innovation, form partnerships, and navigate legal obligations with confidence. While onchain governance is integral to Uniswap's credible neutrality, it has historically lacked the corresponding infrastructure for basic offchain coordination and formalized protection for its collective actions. To execute on our vision, we need something more. \
+\
+To that end, over the past two years, the Uniswap Foundation has explored options for establishing a legal structure that is intended to: \
+\
+- Provide more clarity regarding liability protection for Uniswap Governance participants; \
+- Maintain the primary authority of the Uniswap Governance protocol; and \
+- Enable execution of offchain operations without introducing centralized points of control. \
+\
+After significant research, legal consultation, and community engagement, the Wyoming DUNA (passed into law in 2024) emerged as a credibly neutral and transparent option. It has been explicitly designed for decentralized protocol governance systems to gain legal legitimacy without compromising their core ethos. \
+\
+In our research, we have worked closely with a firm called Cowrie, founded by David Kerr. Based in Cheyenne, Wyoming, Cowrie is composed of a team of regulatory and technical experts that provides legal, financial, and administrative support to decentralized protocols. David was instrumental in writing Wyoming's DUNA statute, and has worked directly with legislators to educate them on the intricacies of the DUNA, what it enables DAOs to accomplish, what DAOs are, why decentralization is important, etc. Cowrie's role in the context of DUNI is to act as an Administrator of DUNI - facilitating regulatory and tax compliance, tax filings, informational reporting, and operational infrastructure within the constructs of its authorizations. \
+\
+## Specification \
+\
+If this proposal passes, the resulting onchain transaction will adopt a DUNA for Uniswap Governance. Specifically, it will: \
+\
+- Ratify the DUNA's Association Agreement establishing the rules of DUNI; \
+- Execute a Ministerial Agent Agreement with the Uniswap Foundation; and \
+- Execute an Administrator Agreement with Cowrie - Administrator Services; This includes the execution of a separate Administrator Agreement with David Kerr (CEO of Cowrie) for specific authorizations. \
+\
+Additionally, the transaction will execute two transfers of UNI from the treasury, specifically: \
+\
+- $16.5m worth of UNI to a DUNI-owned wallet to prefund a legal defense budget and a tax compliance budget; \
+- $75k worth of UNI to Cowrie for their services as compliance administrator. \
+\
+All supporting documentation can be found on the [UF's website here](https://www.uniswapfoundation.org/duni). \
+";
 
   // =============================================================
   //      Protocol & Governance Constants
@@ -70,7 +106,7 @@ contract CreateProposal is Script {
   // =============================================================
   address public SOLO_AGREEMENT_ANCHOR = address(0xe4b69D68341abBdd08023cD39bAe9a0D5360B6c1);
   address public COWRIE_AGREEMENT_ANCHOR = address(0x22005982Ae6BD2E90167F34a4604FfD59AFa7E9d);
-  address public UF_AGREEMENT_ANCHOR = address(0x64aCa2CE7e855a3C64E1Da32D927eD07bAC40718);
+  address public UF_AGREEMENT_ANCHOR = address(0x5267b6C862D3e8826717Eba42936e310425C02FA);
 
   bytes32 public AGREEMENT_SCHEMA_UID = SOLO_AGREEMENT_ANCHOR.code.length == 0
     ? bytes32(0)
@@ -83,7 +119,7 @@ contract CreateProposal is Script {
   bytes32 constant COWRIE_CONTENT_HASH =
     0x1e9a075250e3bb62dec90c499ff00a8def24f4e9be7984daf11936d57dca2f76;
   bytes32 constant UF_CONTENT_HASH =
-    0xa2fd33dd87091d25c15d94c0097395c08f2689efe6a2f8c53a1194222e442dd5;
+    0x6dd5ee280fe12c69425c9d4b137d8f64578f5e67b76904e994687644f7511516;
 
   function run() public returns (uint256 proposalId) {
     // --- Proposal Actions Setup ---
@@ -132,6 +168,22 @@ contract CreateProposal is Script {
     // --- Encode the final propose call ---
     bytes memory proposalCalldata =
       abi.encodeCall(IGovernorBravo.propose, (targets, values, signatures, calldatas, description));
+
+    console.log("Calldata details:");
+    for (uint256 i = 0; i < calldatas.length; i++) {
+      console.log("Target", i);
+      console.log(targets[i]);
+      console.log("Value", i);
+      console.log(values[i]);
+      console.log("Signature", i);
+      console.log(signatures[i]);
+      console.log("Calldata", i);
+      console.logBytes(calldatas[i]);
+      console.log("--------------------------------");
+    }
+
+    console.log("Description:");
+    console.log(description);
 
     console.log("GovernorBravo.propose() Calldata:");
     console.logBytes(proposalCalldata);

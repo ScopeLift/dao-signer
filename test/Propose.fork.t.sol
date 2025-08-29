@@ -40,7 +40,7 @@ contract ProposalForkTest is Test {
   function setUp() public {
     // Fork from Mainnet
     string memory rpcURL = vm.envString("MAINNET_RPC_URL");
-    vm.createSelectFork(rpcURL, 23_241_898);
+    vm.createSelectFork(rpcURL, 23_248_773);
 
     // Instantiate the script contract
     createProposalScript = new CreateProposalScript();

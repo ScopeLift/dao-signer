@@ -55,43 +55,57 @@ contract CreateProposal is Script {
 
   // TODO: Confirm proposal description
   string internal constant PROPOSAL_DESCRIPTION =
-    "# Summary \
-\
-The Uniswap Foundation (\"UF\") proposes that Uniswap Governance adopt a Wyoming-registered Decentralized Unincorporated Nonprofit Association (\"DUNA\") as the legal structure for the Uniswap Governance Protocol. This new legal entity, called \"DUNI\", will be purpose-built to preserve Uniswap's decentralized governance structure while enabling engagement with the offchain world (e.g., entering into contracts, retaining service providers, and fulfilling any potential regulatory and tax responsibilities). \
-\
-If adopted, DUNI will be a legal entity for Uniswap Governance that recognizes the binding validity of onchain Governance Proposals with the intention of providing certainty regarding its legal structure and intended liability protections for members of DUNI. Adopting DUNI does not, in any way, alter the Uniswap Protocol, the UNI token, or the core mechanics of onchain governance. Rather, it represents a significant step in equipping Uniswap Governance for the future. \
-\
-Importantly, establishing Uniswap Governance as a DUNA would bolster critical limited liability protections for governance participants. This step is intended to protect governance participants from potential personal exposure to possible legal or tax liabilities stemming from the collective action taken by Uniswap Governance. This is a critical step in de-risking engagement in Uniswap Governance without compromising decentralization. \
-\
-## Background & Motivation \
-\
-In the Uniswap Unleashed roadmap, we described a vision for evolving Uniswap Governance. In this vision, Governance can turn on the protocol fee, fund innovation, form partnerships, and navigate legal obligations with confidence. While onchain governance is integral to Uniswap's credible neutrality, it has historically lacked the corresponding infrastructure for basic offchain coordination and formalized protection for its collective actions. To execute on our vision, we need something more. \
-\
-To that end, over the past two years, the Uniswap Foundation has explored options for establishing a legal structure that is intended to: \
-\
-- Provide more clarity regarding liability protection for Uniswap Governance participants; \
-- Maintain the primary authority of the Uniswap Governance protocol; and \
-- Enable execution of offchain operations without introducing centralized points of control. \
-\
-After significant research, legal consultation, and community engagement, the Wyoming DUNA (passed into law in 2024) emerged as a credibly neutral and transparent option. It has been explicitly designed for decentralized protocol governance systems to gain legal legitimacy without compromising their core ethos. \
-\
-In our research, we have worked closely with a firm called Cowrie, founded by David Kerr. Based in Cheyenne, Wyoming, Cowrie is composed of a team of regulatory and technical experts that provides legal, financial, and administrative support to decentralized protocols. David was instrumental in writing Wyoming's DUNA statute, and has worked directly with legislators to educate them on the intricacies of the DUNA, what it enables DAOs to accomplish, what DAOs are, why decentralization is important, etc. Cowrie's role in the context of DUNI is to act as an Administrator of DUNI - facilitating regulatory and tax compliance, tax filings, informational reporting, and operational infrastructure within the constructs of its authorizations. \
-\
-## Specification \
-\
-If this proposal passes, the resulting onchain transaction will adopt a DUNA for Uniswap Governance. Specifically, it will: \
-\
-- Ratify the DUNA's Association Agreement establishing the rules of DUNI; \
-- Execute a Ministerial Agent Agreement with the Uniswap Foundation; and \
-- Execute an Administrator Agreement with Cowrie - Administrator Services; This includes the execution of a separate Administrator Agreement with David Kerr (CEO of Cowrie) for specific authorizations. \
-\
-Additionally, the transaction will execute two transfers of UNI from the treasury, specifically: \
-\
-- $16.5m worth of UNI to a DUNI-owned wallet to prefund a legal defense budget and a tax compliance budget; \
-- $75k worth of UNI to Cowrie for their services as compliance administrator. \
-\
-All supporting documentation can be found on the [UF's website here](https://www.uniswapfoundation.org/duni). \
-";
+    "# Establish Uniswap Governance as \"DUNI,\" a Wyoming DUNA\n\n" "## Summary\n\n"
+    "The Uniswap Foundation (\"UF\") proposes that Uniswap Governance adopt a Wyoming-registered "
+    "Decentralized Unincorporated Nonprofit Association (\"DUNA\") as the legal structure for the "
+    "Uniswap Governance Protocol. This new legal entity, called \"DUNI\", will be purpose-built to "
+    "preserve Uniswap's decentralized governance structure while enabling engagement with the offchain "
+    "world (e.g., entering into contracts, retaining service providers, and fulfilling any potential "
+    "regulatory and tax responsibilities).\n\n"
+    "If adopted, DUNI will be a legal entity for Uniswap Governance that recognizes the binding "
+    "validity of onchain Governance Proposals with the intention of providing certainty regarding its "
+    "legal structure and intended liability protections for members of DUNI. Adopting DUNI does not, "
+    "in any way, alter the Uniswap Protocol, the UNI token, or the core mechanics of onchain governance. "
+    "Rather, it represents a significant step in equipping Uniswap Governance for the future.\n\n"
+    "Importantly, establishing Uniswap Governance as a DUNA would bolster critical limited liability "
+    "protections for governance participants. This step is intended to protect governance participants "
+    "from potential personal exposure to possible legal or tax liabilities stemming from the collective "
+    "action taken by Uniswap Governance. This is a critical step in de-risking engagement in Uniswap "
+    "Governance without compromising decentralization.\n\n" "## Background & Motivation\n\n"
+    "In the Uniswap Unleashed roadmap, we described a vision for evolving Uniswap Governance. In this "
+    "vision, Governance can turn on the protocol fee, fund innovation, form partnerships, and navigate "
+    "legal obligations with confidence. While onchain governance is integral to Uniswap's credible "
+    "neutrality, it has historically lacked the corresponding infrastructure for basic offchain "
+    "coordination and formalized protection for its collective actions. To execute on our vision, we "
+    "need something more.\n\n"
+    "To that end, over the past two years, the Uniswap Foundation has explored options for establishing "
+    "a legal structure that is intended to:\n\n"
+    "- Provide more clarity regarding liability protection for Uniswap Governance participants;\n"
+    "- Maintain the primary authority of the Uniswap Governance protocol; and\n"
+    "- Enable execution of offchain operations without introducing centralized points of control.\n\n"
+    "After significant research, legal consultation, and community engagement, the Wyoming DUNA (passed "
+    "into law in 2024) emerged as a credibly neutral and transparent option. It has been explicitly "
+    "designed for decentralized protocol governance systems to gain legal legitimacy without "
+    "compromising their core ethos.\n\n"
+    "In our research, we have worked closely with a firm called Cowrie, founded by David Kerr. Based in "
+    "Cheyenne, Wyoming, Cowrie is composed of a team of regulatory and technical experts that provides "
+    "legal, financial, and administrative support to decentralized protocols. David was instrumental in "
+    "writing Wyoming's DUNA statute, and has worked directly with legislators to educate them on the "
+    "intricacies of the DUNA, what it enables DAOs to accomplish, what DAOs are, why decentralization is "
+    "important, etc. Cowrie's role in the context of DUNI is to act as an Administrator of DUNI - "
+    "facilitating regulatory and tax compliance, tax filings, informational reporting, and operational "
+    "infrastructure within the constructs of its authorizations.\n\n" "## Specification\n\n"
+    "If this proposal passes, the resulting onchain transaction will adopt a DUNA for Uniswap Governance. "
+    "Specifically, it will:\n\n"
+    "- Ratify the DUNA's Association Agreement establishing the rules of DUNI;\n"
+    "- Execute a Ministerial Agent Agreement with the Uniswap Foundation; and\n"
+    "- Execute an Administrator Agreement with Cowrie - Administrator Services; This includes the "
+    "execution of a separate Administrator Agreement with David Kerr (CEO of Cowrie) for specific "
+    "authorizations.\n\n"
+    "Additionally, the transaction will execute two transfers of UNI from the treasury, specifically:\n\n"
+    "- $16.5m worth of UNI to a DUNI-owned wallet to prefund a legal defense budget and a tax compliance budget;\n"
+    "- $75k worth of UNI to Cowrie for their services as compliance administrator.\n\n"
+    "All supporting documentation can be found on the [UF's website here](https://www.uniswapfoundation.org/duni).";
 
   // =============================================================
   //      Protocol & Governance Constants

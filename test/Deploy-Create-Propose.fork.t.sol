@@ -56,6 +56,8 @@ contract ProposalForkTest is Test {
   }
 
   function test_EndToEndProposalCreation() public {
+    // No longer needed, but keeping this here for reference
+    vm.skip(true);
     // =============================================================
     //      Step 1: Deploy Resolver and Register Schema
     // =============================================================

@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {DeployAndRegisterSchema} from "script/script-base/DeployAndRegisterSchema.sol";
+import {
+  DeployAndRegisterSchema,
+  AgreementResolver
+} from "script/script-base/DeployAndRegisterSchema.sol";
 
 contract SepoliaConfig is DeployAndRegisterSchema {
   // DAO-related config
@@ -24,7 +27,7 @@ contract SepoliaConfig is DeployAndRegisterSchema {
     });
   }
 
-  function run() public override {
-    super.run();
+  function run() public override returns (AgreementResolver resolver, bytes32 schemaHash) {
+    (resolver, schemaHash) = super.run();
   }
 }

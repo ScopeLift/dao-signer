@@ -17,18 +17,18 @@ abstract contract DeployAndRegisterSchema is Script {
 
   function config() internal virtual returns (Config memory);
 
-  function run() public virtual {
+  function run() public virtual returns (AgreementResolver resolver, bytes32 schemaHash) {
     vm.startBroadcast();
 
     IEAS eas = IEAS(config().eas);
     ISchemaRegistry schemaRegistry = ISchemaRegistry(config().schemaRegistry);
 
     // Deploy resolver (and factory)
-    AgreementResolver resolver = new AgreementResolver(eas, config().primarySigner);
+    resolver = new AgreementResolver(eas, config().primarySigner);
 
     // Deploy the schema
     string memory schema = "bytes32 contentHash";
-    bytes32 schemaHash = schemaRegistry.register(schema, resolver, false);
+    schemaHash = schemaRegistry.register(schema, resolver, false);
 
     AttestationRequest memory nameAttestation = AttestationRequest({
       schema: config().namingUID,

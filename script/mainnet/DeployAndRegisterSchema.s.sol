@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {DeployAndRegisterSchema} from "script/script-base/DeployAndRegisterSchema.sol";
+import {
+  DeployAndRegisterSchema,
+  AgreementResolver
+} from "script/script-base/DeployAndRegisterSchema.sol";
 
 contract MainnetConfig is DeployAndRegisterSchema {
   // DAO-related config
-  string public constant SCHEMA_NAME = "Guinea Pig DAO Agreement";
-  // TODO: Guinea Pig DAO address
-  address public constant PRIMARY_SIGNER = 0x0000000000000000000000000000000000000000;
+  string public constant SCHEMA_NAME = "DUNI Agreements";
+  address public constant PRIMARY_SIGNER = 0x1a9C8182C09F50C8318d769245beA52c32BE35BC; // Uniswap
+    // Timelock
 
   // EAS-related config
   address public constant EAS_ADDRESS = 0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587;
@@ -25,7 +28,7 @@ contract MainnetConfig is DeployAndRegisterSchema {
     });
   }
 
-  function run() public override {
-    super.run();
+  function run() public override returns (AgreementResolver resolver, bytes32 schemaHash) {
+    (resolver, schemaHash) = super.run();
   }
 }
